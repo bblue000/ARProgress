@@ -24,6 +24,7 @@ import java.lang.ref.WeakReference;
  */
 public class ARProgress extends Dialog {
 
+    protected final int[] mShowLocationOnScreen = new int[2];
     protected final Rect mShowRect = new Rect();
     protected final RectF mShowRectF = new RectF();
     protected RelativeLayout mRoot;
@@ -37,11 +38,9 @@ public class ARProgress extends Dialog {
     protected ARProgress(Context context, int defStyleRes) {
         super(context, defStyleRes);
 
-        initBindBound();
-
         super.setContentView(R.layout.paprogress_root__ar);
-        mRoot = (RelativeLayout) findViewById(R.id.paprogress_root__ar_container);
-        mContent = (RelativeLayout) findViewById(R.id.paprogress_root__ar_content);
+        mRoot = (RelativeLayout) super.findViewById(R.id.paprogress_root__ar_container);
+        mContent = (RelativeLayout) super.findViewById(R.id.paprogress_root__ar_content);
 
         TypedArray a = getContext().obtainStyledAttributes(R.styleable.ARPAProgress);
         Drawable contentBg = a.getDrawable(R.styleable.ARPAProgress_contentBackground__PA);
@@ -49,16 +48,9 @@ public class ARProgress extends Dialog {
         a.recycle();
 
         setContentBackground(contentBg);
-
         if (layoutId > 0) {
             setContentView(layoutId);
         }
-    }
-
-    protected void initBindBound() {
-        DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
-        mShowRect.set(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
-        copyToRectF();
     }
 
     @Override
@@ -72,11 +64,18 @@ public class ARProgress extends Dialog {
     public void setContentView(int layoutResID, int gravity) {
         mContent.removeAllViews();
         getLayoutInflater().inflate(layoutResID, mContent);
-        applyByGravity((RelativeLayout.LayoutParams) mContent.getChildAt(0).getLayoutParams(), gravity);
+        applyByGravity(mContent.getChildAt(0), gravity);
     }
 
     @Override
     public void setContentView(View view) {
+        setContentView(view, Gravity.CENTER);
+    }
+
+    /**
+     * @param gravity 内容相对父控件位置，请使用绝对的位置
+     */
+    public void setContentView(View view, int gravity) {
         if (null != view.getParent()) {
             throw new IllegalArgumentException("view has a parent already");
         }
@@ -86,20 +85,14 @@ public class ARProgress extends Dialog {
             params = generateDefaultLayoutParams();
         }
         mContent.addView(view, params);
-    }
-
-    /**
-     * @param gravity 内容相对父控件位置，请使用绝对的位置
-     */
-    public void setContentView(View view, int gravity) {
-        setContentView(view);
-        applyByGravity((RelativeLayout.LayoutParams) view.getLayoutParams(), gravity);
+        applyByGravity(view, gravity);
     }
 
     /**
      * @param gravity 请使用绝对的位置
      */
-    protected void applyByGravity(RelativeLayout.LayoutParams params, int gravity) {
+    protected void applyByGravity(View child, int gravity) {
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) child.getLayoutParams();
         int hGravity = gravity & Gravity.HORIZONTAL_GRAVITY_MASK;
         int vGravity = gravity & Gravity.VERTICAL_GRAVITY_MASK;
         switch (hGravity) {
@@ -126,6 +119,8 @@ public class ARProgress extends Dialog {
                 params.addRule(RelativeLayout.CENTER_VERTICAL);
                 break;
         }
+        // update
+        child.setLayoutParams(params);
     }
 
     /**
@@ -243,22 +238,30 @@ public class ARProgress extends Dialog {
         if (null == target) {
             initBindBound();
         } else {
+//            target.getLocationOnScreen(mShowLocationOnScreen);
+            target.getLocationInWindow(mShowLocationOnScreen);
             target.getGlobalVisibleRect(mShowRect);
             copyToRectF();
         }
     }
 
+    protected void initBindBound() {
+        DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
+        mShowRect.set(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
+        copyToRectF();
+    }
+
     protected void copyToRectF() {
-        mShowRectF.set(mShowRect.left, mShowRect.top,
-                mShowRect.right, mShowRect.bottom);
+        mShowRectF.set(mShowRect);
     }
 
     protected void updateBindBoundToContent() {
         RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mContent.getLayoutParams();
-        lp.leftMargin = mShowRect.left;
-        lp.topMargin = mShowRect.top;
+        lp.leftMargin = mShowLocationOnScreen[0];//mShowRect.left;
+        lp.topMargin = mShowLocationOnScreen[1];//mShowRect.top;
         lp.width = mShowRect.width();
         lp.height = mShowRect.height();
+        mContent.setLayoutParams(lp);
     }
 
     public void show() {
@@ -268,7 +271,6 @@ public class ARProgress extends Dialog {
         }
 
         updateBindBound(getBindBoundView());
-
         updateBindBoundToContent();
         super.show();
     }

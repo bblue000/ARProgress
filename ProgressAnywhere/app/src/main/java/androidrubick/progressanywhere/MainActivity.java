@@ -16,7 +16,7 @@ public class MainActivity extends Activity {
             @Override
             public void run() {
                 ARProgressBuilder.from(MainActivity.this)
-//                        .bindBoundView(findViewById(R.id.tv))
+                        .bindBoundView(findViewById(R.id.tv))
                         .build().show();
             }
         }, 1000L);

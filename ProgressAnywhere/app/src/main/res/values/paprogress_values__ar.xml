@@ -16,14 +16,13 @@
     </declare-styleable>
 
     <color name="arpaprogress__ar_def_window_bg">#ff0000</color>
-    <color name="arpaprogress__ar_def_window_content_bg">#33333333</color>
+    <color name="arpaprogress__ar_def_window_content_bg">#ff0000</color>
 
-    <style name="ARPAProgress" parent="android:Theme.NoTitleBar.Fullscreen">
+    <style name="ARPAProgress">
         <!-- Window attributes -->
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowFullscreen">true</item>
         <!-- we consider is floating -->
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowIsTranslucent">true</item>
