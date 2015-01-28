@@ -13,28 +13,28 @@
     <declare-styleable name="ARPAProgress">
         <attr name="contentLayout__PA"/>
         <attr name="contentBackground__PA"/>
+        <attr name="android:windowAnimationStyle"/>
+        <attr name="android:windowCloseOnTouchOutside"/>
     </declare-styleable>
 
-    <color name="arpaprogress__ar_def_window_bg">#ff0000</color>
-    <color name="arpaprogress__ar_def_window_content_bg">#ff0000</color>
-
-    <style name="ARPAProgress">
+    <!-- below is needed -->
+    <style name="ARPAProgressRestrict">
         <!-- Window attributes -->
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item>
-        <!-- we consider is floating -->
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowContentOverlay">@null</item>
-
-        <item name="android:windowAnimationStyle">@style/ARPAProgress.Anim.Def</item>
-
-        <item name="contentBackground__PA">@color/arpaprogress__ar_def_window_content_bg</item>
     </style>
 
-    <style name="ARPAProgress.Anim"/>
-    <style name="ARPAProgress.Anim.Def">
+    <style name="ARPAProgressStyleDefault">
+        <item name="contentBackground__PA">#33333333</item>
+        <item name="android:windowAnimationStyle">@style/ARPAProgressAnimDefault</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+    </style>
+
+    <style name="ARPAProgressAnimDefault">
         <item name="android:windowEnterAnimation">@anim/paanim_def__ar_show</item>
         <item name="android:windowExitAnimation">@anim/paanim_def__ar_hide</item>
     </style>

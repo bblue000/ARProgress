@@ -4,13 +4,14 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
 import java.lang.ref.WeakReference;
@@ -24,12 +25,25 @@ import java.lang.ref.WeakReference;
  */
 public class ARProgress extends Dialog {
 
-    protected final int[] mShowLocationOnScreen = new int[2];
+    protected final Rect mRootRect = new Rect();
     protected final Rect mShowRect = new Rect();
-    protected final RectF mShowRectF = new RectF();
     protected RelativeLayout mRoot;
     protected RelativeLayout mContent;
+    protected boolean mCloseOnTouchOutside;
     protected WeakReference<View> mBindBoundView;
+    protected ARProgressRootImpl.Callback mCallback = new ARProgressRootImpl.Callback() {
+        @Override
+        public boolean onMeasured(int widthMeasureSpec, int heightMeasureSpec) {
+            updateBindBoundToContent();
+            return true;
+        }
+
+        @Override
+        public boolean onLayouted(boolean changed, int l, int t, int r, int b) {
+            relayout(changed, l, t, r, b);
+            return true;
+        }
+    };
 
     protected ARProgress(Context context) {
         this(context, 0);
@@ -38,19 +52,30 @@ public class ARProgress extends Dialog {
     protected ARProgress(Context context, int defStyleRes) {
         super(context, defStyleRes);
 
-        super.setContentView(R.layout.paprogress_root__ar);
-        mRoot = (RelativeLayout) super.findViewById(R.id.paprogress_root__ar_container);
+        ARProgressRootImpl root = new ARProgressRootImpl(getContext(), null, defStyleRes);
+        root.setCallback(mCallback);
+        mRoot = root;
+        super.setContentView(mRoot, new WindowManager.LayoutParams(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.FILL_PARENT));
+
+        // ignore float window
+        getWindow().setLayout(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);
+
+        getLayoutInflater().inflate(R.layout.paprogress_content__ar, mRoot);
         mContent = (RelativeLayout) super.findViewById(R.id.paprogress_root__ar_content);
 
-        TypedArray a = getContext().obtainStyledAttributes(R.styleable.ARPAProgress);
+        TypedArray a = getContext().obtainStyledAttributes(null, R.styleable.ARPAProgress, 0, defStyleRes);
         Drawable contentBg = a.getDrawable(R.styleable.ARPAProgress_contentBackground__PA);
         int layoutId = a.getResourceId(R.styleable.ARPAProgress_contentLayout__PA, 0);
+        int animStyleId = a.getResourceId(R.styleable.ARPAProgress_android_windowAnimationStyle, 0);
+        boolean closeOnTouchOutside = a.getBoolean(R.styleable.ARPAProgress_android_windowCloseOnTouchOutside, true);
         a.recycle();
 
         setContentBackground(contentBg);
         if (layoutId > 0) {
             setContentView(layoutId);
         }
+        getWindow().getAttributes().windowAnimations = animStyleId;
+        setCanceledOnTouchOutside(closeOnTouchOutside);
     }
 
     @Override
@@ -222,46 +247,59 @@ public class ARProgress extends Dialog {
         } else {
             mBindBoundView = new WeakReference<View>(view);
         }
-        updateBindBound(view);
     }
 
     public View getBindBoundView() {
         return null == mBindBoundView ? null : mBindBoundView.get();
     }
 
-    /**
-     * 绑定目标View的显示区域（相对于整个屏幕）
-     *
-     * @param target 目标View
-     */
-    protected void updateBindBound(View target) {
-        if (null == target) {
-            initBindBound();
-        } else {
-//            target.getLocationOnScreen(mShowLocationOnScreen);
-            target.getLocationInWindow(mShowLocationOnScreen);
-            target.getGlobalVisibleRect(mShowRect);
-            copyToRectF();
-        }
-    }
-
     protected void initBindBound() {
         DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
-        mShowRect.set(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
-        copyToRectF();
-    }
-
-    protected void copyToRectF() {
-        mShowRectF.set(mShowRect);
+        mRootRect.set(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
+        mShowRect.set(mRootRect);
     }
 
     protected void updateBindBoundToContent() {
+        // 重新绑定目标View的显示区域（相对于整个屏幕）
+        View target = getBindBoundView();
+        if (null == target) {
+            initBindBound();
+        } else {
+            target.getGlobalVisibleRect(mShowRect);
+        }
+
         RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mContent.getLayoutParams();
-        lp.leftMargin = mShowLocationOnScreen[0];//mShowRect.left;
-        lp.topMargin = mShowLocationOnScreen[1];//mShowRect.top;
         lp.width = mShowRect.width();
         lp.height = mShowRect.height();
-        mContent.setLayoutParams(lp);
+    }
+
+    protected void relayout(boolean changed, int l, int t, int r, int b) {
+        int offsetX = 0;
+        int offsetY = 0;
+        if (mRoot.getGlobalVisibleRect(mRootRect)) {
+            offsetX = mRootRect.left;
+            offsetY = mRootRect.top;
+        }
+        int left = Math.max(0, mShowRect.left - offsetX);
+        int top = Math.max(0, mShowRect.top - offsetY);
+        mContent.layout(left, top, left + mShowRect.width(), top + mShowRect.height());
+    }
+
+    @Override
+    public void setCanceledOnTouchOutside(boolean cancel) {
+        super.setCanceledOnTouchOutside(cancel);
+        mCloseOnTouchOutside = cancel;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int x = (int) event.getRawX();
+        int y = (int) event.getRawY();
+        if (mCloseOnTouchOutside && isShowing() && !mShowRect.contains(x, y)) {
+            cancel();
+            return true;
+        }
+        return super.onTouchEvent(event);
     }
 
     public void show() {
@@ -269,9 +307,6 @@ public class ARProgress extends Dialog {
             super.show();
             return ;
         }
-
-        updateBindBound(getBindBoundView());
-        updateBindBoundToContent();
         super.show();
     }
 

@@ -1,6 +1,7 @@
 package androidrubick.progressanywhere;
 
 import android.content.Context;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -121,10 +122,12 @@ import android.view.WindowManager;
      * 创建全局
      */
     public ARProgress build() {
-        if (mStyleId <= 0) {
-            mStyleId = R.style.ARPAProgress;
+        ContextThemeWrapper context = new ContextThemeWrapper(mContext, R.style.ARPAProgressStyleDefault);
+        if (mStyleId > 0) {
+            // update
+            context.setTheme(mStyleId);
         }
-        ARProgress dialog = new ARProgress(mContext, mStyleId);
+        ARProgress dialog = new ARProgress(context, R.style.ARPAProgressRestrict);
 
         dialog.setOnShowListener(mARProgressListener);
         dialog.setOnDismissListener(mARProgressListener);

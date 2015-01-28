@@ -1,9 +1,14 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme">
+    <style name="AppTheme" parent="android:Theme.Light.NoTitleBar.Fullscreen">
         <!-- Customize your theme here. -->
         <item name="android:progressBarStyle">@android:style/Widget.ProgressBar.Large</item>
+    </style>
+
+    <style name="AppContentLoading">
+        <item name="contentBackground__PA">#ff0000</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.InputMethod</item>
     </style>
 
 </resources>
