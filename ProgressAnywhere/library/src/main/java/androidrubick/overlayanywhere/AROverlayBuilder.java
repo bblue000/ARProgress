@@ -129,6 +129,11 @@ public class AROverlayBuilder {
      * 创建全局
      */
     public AROverlay build() {
+//        return new AROverlayWrapper(this);
+        return buildInner();
+    }
+
+    protected AROverlay buildInner() {
         ContextThemeWrapper context = new ContextThemeWrapper(mContext, R.style.AROverlayStyleDefault);
         if (mStyleId > 0) {
             // update

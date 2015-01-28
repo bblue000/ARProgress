@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item name="contentTag__PA" type="id"/>
-
     <attr name="contentLoadingBackground" format="color|reference"/>
     <attr name="contentLoadingLayout" format="reference"/>
     <attr name="globalProgressBackground" format="color|reference"/>
