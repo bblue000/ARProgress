@@ -1,9 +1,11 @@
-package androidrubick.progressanywhere;
+package androidrubick.overlayanywhere;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
+import androidrubick.progressanywhere.R;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
@@ -15,6 +17,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.tv).setOnClickListener(this);
         findViewById(R.id.btn).setOnClickListener(this);
         findViewById(R.id.iv).setOnClickListener(this);
+
     }
 
     @Override
@@ -25,7 +28,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        ARProgressBuilder.from(MainActivity.this)
+        AROverlayBuilder.from(MainActivity.this)
                 .style(R.style.AppContentLoading)
                 .bindBoundView(v)
                 .build().show();

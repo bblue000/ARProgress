@@ -1,18 +1,17 @@
-package androidrubick.progressanywhere;
+package androidrubick.overlayanywhere;
 
 import android.content.DialogInterface;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
-import android.view.View;
 
 /**
- * 默认实现，方便直接重写想要的方法
+ * 综合的监听器，包含Overlay的一些回调的缺省实现，方便直接重写想要的方法
  *
  * <p/>
  *
  * Created by Yin Yong on 2015/1/27.
  */
-public class ARSimpleProgressListener implements ARProgressListener {
+public class ARSimpleOverlayListener implements AROverlayListener {
+
     @Override
     public void onCancel(DialogInterface dialog) {
 

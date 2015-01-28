@@ -1,4 +1,4 @@
-package androidrubick.progressanywhere;
+package androidrubick.overlayanywhere;
 
 import android.content.Context;
 import android.view.ContextThemeWrapper;
@@ -11,14 +11,14 @@ import android.view.WindowManager;
  *
  * Created by Yin Yong on 2015/1/26.
  */
-/*package*/ class ARProgressBuilder {
+public class AROverlayBuilder {
 
-    public static ARProgressBuilder from(Context context) {
-        return new ARProgressBuilder(context);
+    public static AROverlayBuilder from(Context context) {
+        return new AROverlayBuilder(context);
     }
 
     protected Context mContext;
-    protected ARProgressListener mARProgressListener;
+    protected AROverlayListener mAROverlayListener;
     protected boolean mCancelableSet;
     protected boolean mCancelable;
     protected boolean mCanceledOnTouchOutsideSet;
@@ -35,12 +35,12 @@ import android.view.WindowManager;
     protected int mViewRes;
     protected View mViewIns;
     protected ViewGroup.LayoutParams mViewResLp;
-    protected ARProgressBuilder(Context context) {
+    protected AROverlayBuilder(Context context) {
         mContext = context;
     }
 
-    public ARProgressBuilder listeners(ARProgressListener listener) {
-        mARProgressListener = listener;
+    public AROverlayBuilder listeners(AROverlayListener listener) {
+        mAROverlayListener = listener;
         return this;
     }
 
@@ -50,8 +50,8 @@ import android.view.WindowManager;
      *
      * @param cancel  如果没有设置默认为true
      */
-    public ARProgressBuilder cancelable(boolean...cancel) {
-        mCancelable = getValue(cancel, ARProgress.DEFAULT_CANCELABLE);
+    public AROverlayBuilder cancelable(boolean...cancel) {
+        mCancelable = getValue(cancel, AROverlayDialog.DEFAULT_CANCELABLE);
         mCancelableSet = true;
         return this;
     }
@@ -64,8 +64,8 @@ import android.view.WindowManager;
      * @param cancel Whether the dialog should be canceled when touched outside
      *            the window. 如果没有设置默认为true
      */
-    public ARProgressBuilder cancelOnTouchOutside(boolean...cancel) {
-        mCanceledOnTouchOutside = getValue(cancel, ARProgress.DEFAULT_CLOSEONTOUCHOUTSIDE);
+    public AROverlayBuilder cancelOnTouchOutside(boolean...cancel) {
+        mCanceledOnTouchOutside = getValue(cancel, AROverlayDialog.DEFAULT_CLOSEONTOUCHOUTSIDE);
         mCanceledOnTouchOutsideSet = true;
         return this;
     }
@@ -75,19 +75,19 @@ import android.view.WindowManager;
      * @param styleId
      * @return
      *
-     * @see androidrubick.progressanywhere.R.styleable#ARPAProgress
-     * @see androidrubick.progressanywhere.R.styleable#ARPAProgress_contentLayout__PA
-     * @see androidrubick.progressanywhere.R.styleable#ARPAProgress_contentBackground__PA
-     * @see androidrubick.progressanywhere.R.styleable#ARPAProgress_cancelable__PA
-     * @see androidrubick.progressanywhere.R.styleable#ARPAProgress_android_windowAnimationStyle
-     * @see androidrubick.progressanywhere.R.styleable#ARPAProgress_android_windowCloseOnTouchOutside
+     * @see androidrubick.overlayanywhere.R.styleable#ARPAProgress
+     * @see androidrubick.overlayanywhere.R.styleable#ARPAProgress_contentLayout__PA
+     * @see androidrubick.overlayanywhere.R.styleable#ARPAProgress_contentBackground__PA
+     * @see androidrubick.overlayanywhere.R.styleable#ARPAProgress_cancelable__PA
+     * @see androidrubick.overlayanywhere.R.styleable#ARPAProgress_android_windowAnimationStyle
+     * @see androidrubick.overlayanywhere.R.styleable#ARPAProgress_android_windowCloseOnTouchOutside
      */
-    public ARProgressBuilder style(int styleId) {
+    public AROverlayBuilder style(int styleId) {
         mStyleId = styleId;
         return this;
     }
 
-    public ARProgressBuilder view(int layoutId) {
+    public AROverlayBuilder view(int layoutId) {
         mViewType = VIEW_RES;
         mViewRes = layoutId;
         mViewIns = null;
@@ -95,7 +95,7 @@ import android.view.WindowManager;
         return this;
     }
 
-    public ARProgressBuilder view(View view) {
+    public AROverlayBuilder view(View view) {
         mViewType = VIEW_INS;
         mViewRes = 0;
         mViewIns = view;
@@ -103,7 +103,7 @@ import android.view.WindowManager;
         return this;
     }
 
-    public ARProgressBuilder view(View view, WindowManager.LayoutParams layoutParams) {
+    public AROverlayBuilder view(View view, WindowManager.LayoutParams layoutParams) {
         mViewType = VIEW_INS_LP;
         mViewRes = 0;
         mViewIns = view;
@@ -111,7 +111,7 @@ import android.view.WindowManager;
         return this;
     }
 
-    public ARProgressBuilder bindBoundView(View view) {
+    public AROverlayBuilder bindBoundView(View view) {
         mBindBoundView = view;
         return this;
     }
@@ -128,18 +128,18 @@ import android.view.WindowManager;
     /**
      * 创建全局
      */
-    public ARProgress build() {
-        ContextThemeWrapper context = new ContextThemeWrapper(mContext, R.style.ARPAProgressStyleDefault);
+    public AROverlay build() {
+        ContextThemeWrapper context = new ContextThemeWrapper(mContext, R.style.AROverlayStyleDefault);
         if (mStyleId > 0) {
             // update
             context.setTheme(mStyleId);
         }
-        ARProgress dialog = new ARProgress(context, R.style.ARPAProgressRestrict);
+        AROverlayDialog dialog = new AROverlayDialog(context, R.style.AROverlayRestrict);
 
-        dialog.setOnShowListener(mARProgressListener);
-        dialog.setOnDismissListener(mARProgressListener);
-        dialog.setOnCancelListener(mARProgressListener);
-        dialog.setOnKeyListener(mARProgressListener);
+        dialog.setOnShowListener(mAROverlayListener);
+        dialog.setOnDismissListener(mAROverlayListener);
+        dialog.setOnCancelListener(mAROverlayListener);
+        dialog.setOnKeyListener(mAROverlayListener);
 
         if (mCancelableSet) {
             dialog.setCancelable(mCancelable);

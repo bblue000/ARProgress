@@ -1,4 +1,4 @@
-package androidrubick.progressanywhere;
+package androidrubick.overlayanywhere;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -9,7 +9,7 @@ import android.widget.RelativeLayout;
  *
  * Created by Yin Yong on 2015/1/28.
  */
-/*package*/ class ARProgressRootImpl extends RelativeLayout {
+/*package*/ class AROverlayRootImpl extends RelativeLayout {
 
     /*package*/ interface Callback {
         /**
@@ -33,15 +33,15 @@ import android.widget.RelativeLayout;
     }
 
     private Callback mCallback;
-    public ARProgressRootImpl(Context context) {
+    public AROverlayRootImpl(Context context) {
         this(context, null);
     }
 
-    public ARProgressRootImpl(Context context, AttributeSet attrs) {
+    public AROverlayRootImpl(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public ARProgressRootImpl(Context context, AttributeSet attrs, int defStyle) {
+    public AROverlayRootImpl(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <item name="contentTag__PA" type="id"/>
+
     <attr name="contentLoadingBackground" format="color|reference"/>
     <attr name="contentLoadingLayout" format="reference"/>
     <attr name="globalProgressBackground" format="color|reference"/>
     <attr name="globalProgressLayout" format="reference"/>
-
-    <item name="contentTag__PA" type="id"/>
 
     <!-- 通用ARProgress的根View背景和内容背景，内容布局资源ID -->
     <attr name="contentLayout__PA" format="reference"/>
@@ -22,7 +22,7 @@
     </declare-styleable>
 
     <!-- below is needed -->
-    <style name="ARPAProgressRestrict">
+    <style name="AROverlayRestrict">
         <!-- Window attributes -->
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowFrame">@null</item>
@@ -32,14 +32,14 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <style name="ARPAProgressStyleDefault">
+    <style name="AROverlayStyleDefault">
         <item name="contentBackground__PA">#33333333</item>
         <item name="cancelable__PA">true</item>
-        <item name="android:windowAnimationStyle">@style/ARPAProgressAnimDefault</item>
+        <item name="android:windowAnimationStyle">@style/AROverlayAnimDefault</item>
         <item name="android:windowCloseOnTouchOutside">true</item>
     </style>
 
-    <style name="ARPAProgressAnimDefault">
+    <style name="AROverlayAnimDefault">
         <item name="android:windowEnterAnimation">@anim/paanim_def__ar_show</item>
         <item name="android:windowExitAnimation">@anim/paanim_def__ar_hide</item>
     </style>

@@ -1,4 +1,4 @@
-package androidrubick.progressanywhere;
+package androidrubick.overlayanywhere;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference;
  *
  * Created by Yin Yong on 2015/1/26.
  */
-public class ARProgress extends Dialog {
+/*package*/ class AROverlayDialog extends Dialog implements AROverlay {
 
     static final boolean DEFAULT_CANCELABLE = true;
     static final boolean DEFAULT_CLOSEONTOUCHOUTSIDE = true;
@@ -35,7 +35,7 @@ public class ARProgress extends Dialog {
     protected boolean mCancelable;
     protected boolean mCloseOnTouchOutside;
     protected WeakReference<View> mBindBoundView;
-    protected ARProgressRootImpl.Callback mCallback = new ARProgressRootImpl.Callback() {
+    protected AROverlayRootImpl.Callback mCallback = new AROverlayRootImpl.Callback() {
         @Override
         public boolean onMeasured(int widthMeasureSpec, int heightMeasureSpec) {
             updateBindBoundToContent();
@@ -49,14 +49,10 @@ public class ARProgress extends Dialog {
         }
     };
 
-    protected ARProgress(Context context) {
-        this(context, 0);
-    }
-
-    protected ARProgress(Context context, int defStyleRes) {
+    protected AROverlayDialog(Context context, int defStyleRes) {
         super(context, defStyleRes);
 
-        ARProgressRootImpl root = new ARProgressRootImpl(getContext(), null, defStyleRes);
+        AROverlayRootImpl root = new AROverlayRootImpl(getContext(), null, defStyleRes);
         root.setCallback(mCallback);
         mRoot = root;
         super.setContentView(mRoot, new WindowManager.LayoutParams(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.FILL_PARENT));
@@ -156,7 +152,7 @@ public class ARProgress extends Dialog {
 
     /**
      * Returns a set of default layout parameters. These parameters are requested
-     * when the View passed to {@link #setContentView(View)} has no layout parameters
+     * when the View passed to {@link #setContentView(android.view.View)} has no layout parameters
      * already set. If null is returned, an exception is thrown from addView.
      *
      * @return a set of default layout parameters or null
@@ -314,6 +310,7 @@ public class ARProgress extends Dialog {
         return super.onTouchEvent(event);
     }
 
+    @Override
     public void show() {
         if (isShowing()) {
             super.show();
@@ -322,4 +319,12 @@ public class ARProgress extends Dialog {
         super.show();
     }
 
+    @Override
+    public void hide() {
+        super.dismiss();
+    }
+
+    public void superHide() {
+        super.hide();
+    }
 }
