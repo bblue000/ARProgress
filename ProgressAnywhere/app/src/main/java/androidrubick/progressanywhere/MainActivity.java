@@ -2,9 +2,7 @@ package androidrubick.progressanywhere;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 
 public class MainActivity extends Activity implements View.OnClickListener {
@@ -30,14 +28,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         ARProgressBuilder.from(MainActivity.this)
                 .style(R.style.AppContentLoading)
                 .bindBoundView(v)
-                .cancelOnTouchOutside(true)
                 .build().show();
     }
 
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        boolean res = super.dispatchTouchEvent(ev);
-        Log.e("yytest", "" + res);
-        return res;
-    }
 }

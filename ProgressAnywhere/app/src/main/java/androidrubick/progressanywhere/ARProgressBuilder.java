@@ -19,8 +19,10 @@ import android.view.WindowManager;
 
     protected Context mContext;
     protected ARProgressListener mARProgressListener;
-    protected boolean mCancelable = true;
-    protected boolean mCanceledOnTouchOutside = true;
+    protected boolean mCancelableSet;
+    protected boolean mCancelable;
+    protected boolean mCanceledOnTouchOutsideSet;
+    protected boolean mCanceledOnTouchOutside;
     protected int mStyleId;
 
     protected View mBindBoundView;
@@ -49,7 +51,8 @@ import android.view.WindowManager;
      * @param cancel  如果没有设置默认为true
      */
     public ARProgressBuilder cancelable(boolean...cancel) {
-        mCanceledOnTouchOutside = getValue(cancel, true);
+        mCancelable = getValue(cancel, ARProgress.DEFAULT_CANCELABLE);
+        mCancelableSet = true;
         return this;
     }
 
@@ -62,7 +65,8 @@ import android.view.WindowManager;
      *            the window. 如果没有设置默认为true
      */
     public ARProgressBuilder cancelOnTouchOutside(boolean...cancel) {
-        mCanceledOnTouchOutside = getValue(cancel, true);
+        mCanceledOnTouchOutside = getValue(cancel, ARProgress.DEFAULT_CLOSEONTOUCHOUTSIDE);
+        mCanceledOnTouchOutsideSet = true;
         return this;
     }
 
@@ -74,6 +78,9 @@ import android.view.WindowManager;
      * @see androidrubick.progressanywhere.R.styleable#ARPAProgress
      * @see androidrubick.progressanywhere.R.styleable#ARPAProgress_contentLayout__PA
      * @see androidrubick.progressanywhere.R.styleable#ARPAProgress_contentBackground__PA
+     * @see androidrubick.progressanywhere.R.styleable#ARPAProgress_cancelable__PA
+     * @see androidrubick.progressanywhere.R.styleable#ARPAProgress_android_windowAnimationStyle
+     * @see androidrubick.progressanywhere.R.styleable#ARPAProgress_android_windowCloseOnTouchOutside
      */
     public ARProgressBuilder style(int styleId) {
         mStyleId = styleId;
@@ -134,8 +141,12 @@ import android.view.WindowManager;
         dialog.setOnCancelListener(mARProgressListener);
         dialog.setOnKeyListener(mARProgressListener);
 
-        dialog.setCancelable(mCancelable);
-        dialog.setCanceledOnTouchOutside(mCanceledOnTouchOutside);
+        if (mCancelableSet) {
+            dialog.setCancelable(mCancelable);
+        }
+        if (mCanceledOnTouchOutsideSet) {
+            dialog.setCanceledOnTouchOutside(mCanceledOnTouchOutside);
+        }
         switch (mViewType) {
             case VIEW_RES:
                 dialog.setContentView(mViewRes);

@@ -25,10 +25,14 @@ import java.lang.ref.WeakReference;
  */
 public class ARProgress extends Dialog {
 
+    static final boolean DEFAULT_CANCELABLE = true;
+    static final boolean DEFAULT_CLOSEONTOUCHOUTSIDE = true;
+
     protected final Rect mRootRect = new Rect();
     protected final Rect mShowRect = new Rect();
     protected RelativeLayout mRoot;
     protected RelativeLayout mContent;
+    protected boolean mCancelable;
     protected boolean mCloseOnTouchOutside;
     protected WeakReference<View> mBindBoundView;
     protected ARProgressRootImpl.Callback mCallback = new ARProgressRootImpl.Callback() {
@@ -67,7 +71,8 @@ public class ARProgress extends Dialog {
         Drawable contentBg = a.getDrawable(R.styleable.ARPAProgress_contentBackground__PA);
         int layoutId = a.getResourceId(R.styleable.ARPAProgress_contentLayout__PA, 0);
         int animStyleId = a.getResourceId(R.styleable.ARPAProgress_android_windowAnimationStyle, 0);
-        boolean closeOnTouchOutside = a.getBoolean(R.styleable.ARPAProgress_android_windowCloseOnTouchOutside, true);
+        boolean cancelable = a.getBoolean(R.styleable.ARPAProgress_cancelable__PA, DEFAULT_CANCELABLE);
+        boolean closeOnTouchOutside = a.getBoolean(R.styleable.ARPAProgress_android_windowCloseOnTouchOutside, DEFAULT_CLOSEONTOUCHOUTSIDE);
         a.recycle();
 
         setContentBackground(contentBg);
@@ -75,6 +80,7 @@ public class ARProgress extends Dialog {
             setContentView(layoutId);
         }
         getWindow().getAttributes().windowAnimations = animStyleId;
+        setCancelable(cancelable);
         setCanceledOnTouchOutside(closeOnTouchOutside);
     }
 
@@ -283,6 +289,12 @@ public class ARProgress extends Dialog {
         int left = Math.max(0, mShowRect.left - offsetX);
         int top = Math.max(0, mShowRect.top - offsetY);
         mContent.layout(left, top, left + mShowRect.width(), top + mShowRect.height());
+    }
+
+    @Override
+    public void setCancelable(boolean flag) {
+        super.setCancelable(flag);
+        mCancelable = flag;
     }
 
     @Override

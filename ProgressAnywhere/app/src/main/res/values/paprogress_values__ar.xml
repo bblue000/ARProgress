@@ -6,13 +6,17 @@
     <attr name="globalProgressBackground" format="color|reference"/>
     <attr name="globalProgressLayout" format="reference"/>
 
+    <item name="contentTag__PA" type="id"/>
+
     <!-- 通用ARProgress的根View背景和内容背景，内容布局资源ID -->
     <attr name="contentLayout__PA" format="reference"/>
     <attr name="contentBackground__PA" format="color|reference"/>
+    <attr name="cancelable__PA" format="boolean"/>
 
     <declare-styleable name="ARPAProgress">
         <attr name="contentLayout__PA"/>
         <attr name="contentBackground__PA"/>
+        <attr name="cancelable__PA"/>
         <attr name="android:windowAnimationStyle"/>
         <attr name="android:windowCloseOnTouchOutside"/>
     </declare-styleable>
@@ -30,6 +34,7 @@
 
     <style name="ARPAProgressStyleDefault">
         <item name="contentBackground__PA">#33333333</item>
+        <item name="cancelable__PA">true</item>
         <item name="android:windowAnimationStyle">@style/ARPAProgressAnimDefault</item>
         <item name="android:windowCloseOnTouchOutside">true</item>
     </style>
