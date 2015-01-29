@@ -23,10 +23,10 @@ import java.lang.ref.WeakReference;
  *
  * Created by Yin Yong on 2015/1/26.
  */
-/*package*/ class AROverlayDialog extends Dialog implements AROverlay {
+/*package*/ class AROverlayDialog extends Dialog implements AROverlay, AROverlayRootImpl.Callback {
 
     static final boolean DEFAULT_CANCELABLE = true;
-    static final boolean DEFAULT_CLOSEONTOUCHOUTSIDE = true;
+    static final boolean DEFAULT_CANCELONTOUCHOUTSIDE = true;
 
     protected final Rect mRootRect = new Rect();
     protected final Rect mShowRect = new Rect();
@@ -35,25 +35,18 @@ import java.lang.ref.WeakReference;
     protected boolean mCancelable;
     protected boolean mCloseOnTouchOutside;
     protected WeakReference<View> mBindBoundView;
-    protected AROverlayRootImpl.Callback mCallback = new AROverlayRootImpl.Callback() {
-        @Override
-        public boolean onMeasured(int widthMeasureSpec, int heightMeasureSpec) {
-            updateBindBoundToContent();
-            return true;
-        }
-
-        @Override
-        public boolean onLayouted(boolean changed, int l, int t, int r, int b) {
-            relayout(changed, l, t, r, b);
-            return true;
-        }
-    };
+    protected OverlayOf mRecentOverlayOf = OverlayOf.None;
+    protected enum OverlayOf {
+        None,
+        View,
+        Rect;
+    }
 
     protected AROverlayDialog(Context context, int defStyleRes) {
         super(context, defStyleRes);
 
         AROverlayRootImpl root = new AROverlayRootImpl(getContext(), null, defStyleRes);
-        root.setCallback(mCallback);
+        root.setCallback(this);
         mRoot = root;
         super.setContentView(mRoot, new WindowManager.LayoutParams(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.FILL_PARENT));
 
@@ -68,7 +61,7 @@ import java.lang.ref.WeakReference;
         int layoutId = a.getResourceId(R.styleable.ARPAProgress_contentLayout__PA, 0);
         int animStyleId = a.getResourceId(R.styleable.ARPAProgress_android_windowAnimationStyle, 0);
         boolean cancelable = a.getBoolean(R.styleable.ARPAProgress_cancelable__PA, DEFAULT_CANCELABLE);
-        boolean closeOnTouchOutside = a.getBoolean(R.styleable.ARPAProgress_android_windowCloseOnTouchOutside, DEFAULT_CLOSEONTOUCHOUTSIDE);
+        boolean cancelOnTouchOutside = a.getBoolean(R.styleable.ARPAProgress_cancelOnTouchOutside__PA, DEFAULT_CANCELONTOUCHOUTSIDE);
         a.recycle();
 
         setContentBackground(contentBg);
@@ -76,8 +69,13 @@ import java.lang.ref.WeakReference;
             setContentView(layoutId);
         }
         getWindow().getAttributes().windowAnimations = animStyleId;
+        setAnimationStyle(animStyleId);
         setCancelable(cancelable);
-        setCanceledOnTouchOutside(closeOnTouchOutside);
+        setCanceledOnTouchOutside(cancelOnTouchOutside);
+    }
+
+    public void setAnimationStyle(int animStyleId) {
+        getWindow().getAttributes().windowAnimations = animStyleId;
     }
 
     @Override
@@ -244,10 +242,12 @@ import java.lang.ref.WeakReference;
      * @param view 绑定目标View的显示区域（相对于整个屏幕）
      */
     public void setBindBoundView(View view) {
+        mRecentOverlayOf = OverlayOf.None;
         if (null == view) {
             mBindBoundView = null;
         } else {
             mBindBoundView = new WeakReference<View>(view);
+            mRecentOverlayOf = OverlayOf.View;
         }
     }
 
@@ -261,13 +261,39 @@ import java.lang.ref.WeakReference;
         mShowRect.set(mRootRect);
     }
 
+    @Override
+    public boolean onMeasured(int widthMeasureSpec, int heightMeasureSpec) {
+        updateBindBoundToContent();
+        return true;
+    }
+
+    @Override
+    public boolean onLayouted(boolean changed, int l, int t, int r, int b) {
+        relayout(changed, l, t, r, b);
+        return true;
+    }
+
     protected void updateBindBoundToContent() {
         // 重新绑定目标View的显示区域（相对于整个屏幕）
-        View target = getBindBoundView();
-        if (null == target) {
-            initBindBound();
-        } else {
-            target.getGlobalVisibleRect(mShowRect);
+        switch (mRecentOverlayOf) {
+            case Rect: {
+                /*do nothing*/
+                break;
+            }
+            case View:
+            case None:
+            default: {
+                View target = getBindBoundView();
+                if (null == target) {
+                    initBindBound();
+                } else {
+                    if (!target.getGlobalVisibleRect(mShowRect)) {
+                        // target view 没有视图
+                        throw new IllegalStateException("target = {" + target + "} is invisible/gone view, or width/height <= 0");
+                    }
+                }
+                break;
+            }
         }
 
         RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mContent.getLayoutParams();
@@ -310,6 +336,14 @@ import java.lang.ref.WeakReference;
         return super.onTouchEvent(event);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p/>
+     *
+     * 按照最近一次“遮盖”方式显示
+     *
+     */
     @Override
     public void show() {
         if (isShowing()) {
@@ -320,11 +354,33 @@ import java.lang.ref.WeakReference;
     }
 
     @Override
+    public void show(int left, int top, int right, int bottom) {
+        mRecentOverlayOf = OverlayOf.Rect;
+        mShowRect.set(left, top, right, bottom);
+        show();
+    }
+
+    @Override
+    public void show(Rect rect) {
+        mRecentOverlayOf = OverlayOf.Rect;
+        mShowRect.set(rect);
+        show();
+    }
+
+    @Override
+    public void show(View view) {
+        setBindBoundView(view);
+        show();
+    }
+
+    @Override
     public void hide() {
+        super.hide();
+    }
+
+    @Override
+    public void dismiss() {
         super.dismiss();
     }
 
-    public void superHide() {
-        super.hide();
-    }
 }

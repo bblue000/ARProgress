@@ -2,8 +2,10 @@ package androidrubick.overlayanywhere;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidrubick.progressanywhere.R;
 
@@ -28,10 +30,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        AROverlayBuilder.from(MainActivity.this)
+        final AROverlay overlay = AROverlayBuilder.from(MainActivity.this)
                 .style(R.style.AppContentLoading)
+                .view(R.layout.test)
+                .animationStyle(android.R.style.Animation_InputMethod)
                 .bindBoundView(v)
-                .build().show();
+                .build();
+
+        Toast.makeText(this, "" + overlay.findViewById(R.id.tv), Toast.LENGTH_SHORT).show();;
+
+        overlay.show();
     }
 
 }
